@@ -1,10 +1,10 @@
-=======================================
-  YouTube Audio & Video Extractor (v1.12)
-=======================================
+===========================================
+  YouTube Audio & Video Extractor (v1.13)
+============================================
 
 Author: Igor Brzezek (igor.brzezek@gmail.com)
 GitHub: https://github.com/IgorBrzezek
-Version: 1.12
+Version: 1.13
 
 
 -------------------
