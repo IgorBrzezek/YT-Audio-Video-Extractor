@@ -141,9 +141,9 @@ Example 8: Silent Batch Job with Logging Downloads URLs from "work_list.txt" com
 
 python yt_extractor.py --list "work_list.txt" -b --log "work_log.txt"
 
-# On Linux/macOS: echo $?
+### On Linux/macOS: echo $?
 
-# On Windows: echo %ERRORLEVEL%
+### On Windows: echo %ERRORLEVEL%
 
 Example 9: Alternative Strategy with Rate Limiting If standard download fails, try using an Android client simulation and limit the speed to 1 MB/s to appear less aggressive.
 
