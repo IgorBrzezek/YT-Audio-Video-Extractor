@@ -9,7 +9,7 @@ YouTube Audio & Video Extractor (v1.12)
 Info:
   Author: Igor Brzezek (igor.brzezek@gmail.com)
   GitHub: https://github.com/IgorBrzezek/yt-audio-download
-  Version: 1.12
+  Version: 1.13
   Date: 25.10.2025
   
 LICENSE:
@@ -105,7 +105,7 @@ else:
 AUTHOR = 'Igor Brzezek'
 AUTHOR_EMAIL = 'igor.brzezek@gmail.com'
 AUTHOR_GITHUB = 'github.com/igorbrzezek'
-VERSION = 1.12
+VERSION = 1.13
 DATE = '25.10.2025'
 # ============================================================
 
