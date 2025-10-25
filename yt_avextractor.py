@@ -3,14 +3,14 @@
 
 """
 =======================================
-YouTube Audio & Video Extractor (v1.12)
+YouTube Audio & Video Extractor (v1.15)
 =======================================
 
 Info:
   Author: Igor Brzezek (igor.brzezek@gmail.com)
   GitHub: https://github.com/IgorBrzezek/yt-audio-download
-  Version: 1.13
-  Date: 25.10.2025
+  Version: 1.14
+  Date: 28.10.2025
   
 LICENSE:
   MIT License 
@@ -104,9 +104,8 @@ else:
 # === AUTHOR =================================================
 AUTHOR = 'Igor Brzezek'
 AUTHOR_EMAIL = 'igor.brzezek@gmail.com'
-AUTHOR_GITHUB = 'github.com/igorbrzezek'
-VERSION = 1.13
-DATE = '25.10.2025'
+VERSION = 1.15
+DATE = '28.10.2025'
 # ============================================================
 
 # --- yt-dlp additionals options -----------------------------
@@ -408,7 +407,12 @@ def main():
             if args.overwrite or args.batch:
                 download_command.append('--force-overwrite')
 
-            download_command.extend(['-f', 'bestvideo+bestaudio/best', '--merge-output-format', 'mp4'])
+            # --- FIX: Omit format selector if --add-android is used ---
+            if not args.add_android:
+                download_command.extend(['-f', 'bestvideo+bestaudio/best'])
+            # --- End Fix ---
+            
+            download_command.extend(['--merge-output-format', 'mp4'])
             download_command.extend(['--no-mtime', '-o', str(final_filepath)])
 
             if args.color: download_command.extend(['--color', 'always'])
@@ -451,7 +455,15 @@ def main():
             temp_filename_template = f"temp_{os.getpid()}_{i}.%(ext)s"
             temp_filepath_template = destination_dir / temp_filename_template
             
-            download_command = ['yt-dlp', '--no-warnings', '-f', 'bestaudio', '--no-mtime', '-o', str(temp_filepath_template)]
+            download_command = ['yt-dlp', '--no-warnings']
+            
+            # --- FIX: Omit format selector if --add-android is used ---
+            if not args.add_android:
+                download_command.extend(['-f', 'bestaudio'])
+            # --- End Fix ---
+
+            download_command.extend(['--no-mtime', '-o', str(temp_filepath_template)])
+            
             if args.batch: download_command.append('--quiet')
             if args.min or args.pb or (not args.min and not args.batch): 
                 download_command.append('--progress')
@@ -472,7 +484,11 @@ def main():
             
             temp_filepath = None
             try:
-                get_filename_cmd = ['yt-dlp', '--no-warnings', '--encoding', 'utf-8', '--get-filename', '-f', 'bestaudio', '-o', str(temp_filepath_template), url]
+                get_filename_cmd = ['yt-dlp', '--no-warnings', '--encoding', 'utf-8', '--get-filename', '-o', str(temp_filepath_template), url]
+                # Omit format selector for filename step ONLY if using --add-android
+                if not args.add_android: 
+                    get_filename_cmd.extend(['-f', 'bestaudio'])
+                    
                 if args.batch or args.min: get_filename_cmd.append('--quiet')
                 if args.cookies: get_filename_cmd.extend(['--cookies-from-browser', args.cookies])
                 if args.add_header: get_filename_cmd.extend(['--add-header', USER_AGENT_HEADER])
@@ -671,7 +687,6 @@ def conversion_progress_handler(process, args, total_duration, *extra):
                 microseconds = int(us_str.group(1))
                 percent = (microseconds / (total_duration * 1_000_000)) * 100 if total_duration > 0 else 100
                 
-                # --- FIX: Split color output ---
                 color_percent = Colors.OKGREEN if args.color else ""
                 color_text = Colors.OKCYAN if args.color else ""
                 color_end = Colors.ENDC if args.color else ""
