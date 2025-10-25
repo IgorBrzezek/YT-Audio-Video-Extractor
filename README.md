@@ -49,10 +49,10 @@ Before running the script, you **MUST** have the following tools installed and a
 
 Basic command-line syntax:
 
-# For one or more URLs
+### For one or more URLs
 python yt_extractor.py [OPTIONS] "URL_1" "URL_2" ...
 
-# For batch processing from a file
+### For batch processing from a file
 python yt_extractor.py --list "my_links.txt" [OPTIONS]
 IMPORTANT: Always enclose URLs in double quotes (" "). This prevents the command line from misinterpreting special characters like & (common in YouTube playlist URLs).
 
