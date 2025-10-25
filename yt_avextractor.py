@@ -9,7 +9,7 @@ YouTube Audio & Video Extractor (v1.15)
 Info:
   Author: Igor Brzezek (igor.brzezek@gmail.com)
   GitHub: https://github.com/IgorBrzezek/yt-audio-download
-  Version: 1.14
+  Version: 1.15
   Date: 28.10.2025
   
 LICENSE:
