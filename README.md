@@ -6,179 +6,179 @@
 
 ---
 
-## 1. OPIS
+## 1. DESCRIPTION
 
-Jest to skrypt Pythona działający w linii poleceń, przeznaczony do pobierania treści z YouTube. Działa jako zaawansowana i przyjazna dla użytkownika nakładka na narzędzia `yt-dlp` i `ffmpeg`.
+This is a command-line Python script for downloading content from YouTube. It acts as an advanced and user-friendly wrapper for the `yt-dlp` and `ffmpeg` tools.
 
-Jego głównym celem jest:
-a) Wyodrębnienie dźwięku najwyższej jakości, konwersja do MP3 i zapisanie go.
-b) Pobranie pełnego wideo (z dźwiękiem) w najlepszej dostępnej jakości i zapisanie go jako plik MP4.
+Its main purpose is:
+a) To extract the highest quality audio, convert it to MP3, and save it.
+b) To download the full video (with audio) in the best available quality and save it as an MP4 file.
 
-Skrypt jest zaprojektowany pod kątem niezawodności, obsługując pojedyncze linki lub duże partie linków z pliku. Zawiera kluczowe funkcje do omijania typowych błędów pobierania z YouTube, ograniczania prędkości i restrykcji, takie jak używanie plików cookie przeglądarki. Oferuje różne tryby wyświetlania informacji: od szczegółowych pasków postępu, przez minimalistyczny status w jednej linii, aż po całkowicie cichą pracę dla zadań wsadowych.
+The script is designed for reliability, handling single links or large batches of links from a file. It includes key features to bypass common YouTube download errors, speed limits, and restrictions, such as using browser cookies. It offers various display modes: from detailed progress bars, through a minimalist single-line status, to completely silent operation for batch jobs.
 
 ---
 
-## 2. WYMAGANIA
+## 2. REQUIREMENTS
 
-Przed uruchomieniem skryptu **MUSISZ** mieć zainstalowane następujące narzędzia, dostępne z linii poleceń systemu (tj. dodane do systemowej zmiennej środowiskowej PATH):
+Before running the script, you **MUST** have the following tools installed and available from the system's command line (i.e., added to the system's PATH environment variable):
 
 1.  **Python 3:**
-    * Skrypt jest napisany w Pythonie 3.
-    * Potrzebna będzie również biblioteka `colorama`:
+    * The script is written in Python 3.
+    * You will also need the `colorama` library:
         ```bash
         pip install colorama
         ```
 
 2.  **yt-dlp:**
-    * Jest to główny silnik pobierania.
-    * Pobierz stąd: [https://github.com/yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp)
-    * **KRYTYCZNE:** YouTube często zmienia swoją stronę. MUSISZ utrzymywać `yt-dlp` w aktualnej wersji.
-        Uruchamiaj tę komendę regularnie:
+    * This is the main download engine.
+    * Download from here: [https://github.com/yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp)
+    * **CRITICAL:** YouTube frequently changes its site. You MUST keep `yt-dlp` up to date.
+        Run this command regularly:
         ```bash
         yt-dlp -U
         ```
 
 3.  **ffmpeg & ffprobe:**
-    * Są wymagane do ekstrakcji audio i łączenia plików MP4.
-    * Pobierz stąd: [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html)
-    * Skrypt zakończy się błędem, jeśli nie będzie mógł wywołać `ffmpeg` i `ffprobe` z terminala.
+    * These are required for audio extraction and merging MP4 files.
+    * Download from here: [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html)
+    * The script will fail if it cannot call `ffmpeg` and `ffprobe` from the terminal.
 
 ---
 
-## 3. UŻYCIE
+## 3. USAGE
 
-Podstawowa składnia linii poleceń:
+Basic command-line syntax:
 
-# Dla jednego lub więcej URL-i
-python yt_extractor.py [OPCJE] "URL_1" "URL_2" ...
+# For one or more URLs
+python yt_extractor.py [OPTIONS] "URL_1" "URL_2" ...
 
-# Do przetwarzania wsadowego z pliku
-python yt_extractor.py --list "moje_linki.txt" [OPCJE]
-WAŻNE: Zawsze umieszczaj adresy URL w podwójnych cudzysłowach (" "). Zapobiega to błędnej interpretacji przez wiersz poleceń znaków specjalnych, takich jak & (często występujący w adresach URL playlist YouTube).
+# For batch processing from a file
+python yt_extractor.py --list "my_links.txt" [OPTIONS]
+IMPORTANT: Always enclose URLs in double quotes (" "). This prevents the command line from misinterpreting special characters like & (common in YouTube playlist URLs).
 
-## 4. SZCZEGÓŁOWY OPIS OPCJI
+## 4. DETAILED OPTION DESCRIPTION
 
-Poniżej znajduje się opis wszystkich dostępnych opcji linii poleceń, pogrupowanych według kategorii.
+Below is a description of all available command-line options, grouped by category.
 
-Opcje Pomocy
--h, --short-help Pokazuje krótką, jednolinijkową pomoc dla najczęstszych poleceń.
+Help Options
+-h, --short-help Shows short, one-line help for the most common commands.
 
---help Pokazuje pełną, szczegółową pomoc (tę samą, która znajduje się w nagłówku skryptu).
+--help Shows full, detailed help (the same as in the script's header).
 
-Opcje Wejścia i Wyjścia
-urls (Pozycyjny) Jeden lub więcej adresów URL wideo YouTube, oddzielonych spacjami. Ten argument jest ignorowany, jeśli użyto opcji --list. Przykład: python yt_extractor.py "URL1" "URL2"
+Input and Output Options
+urls (Positional) One or more YouTube video URLs, separated by spaces. This argument is ignored if the --list option is used. Example: python yt_extractor.py "URL1" "URL2"
 
--o FILENAME, --output FILENAME Określa niestandardową nazwę pliku wyjściowego. WAŻNE: Ta opcja działa TYLKO podczas pobierania JEDNEGO adresu URL. Zostanie zignorowana, jeśli podasz wiele adresów URL lub użyjesz listy. Przykład: -o "Moja Nazwa Pliku.mp3"
+-o FILENAME, --output FILENAME Specifies a custom output filename. IMPORTANT: This option ONLY works when downloading a SINGLE URL. It will be ignored if you provide multiple URLs or use a list. Example: -o "My File Name.mp3"
 
---list FILE Ścieżka do pliku tekstowego zawierającego listę adresów URL do przetworzenia. Plik powinien zawierać jeden adres URL w każdej linii. NIE używaj cudzysłowów wokół adresów URL wewnątrz pliku. Przykład: --list "linki.txt"
+--list FILE Path to a text file containing a list of URLs to process. The file should contain one URL per line. DO NOT use quotes around the URLs inside the file. Example: --list "links.txt"
 
--dst DIRECTORY Określa katalog docelowy, w którym zostaną zapisane wszystkie pobrane pliki. Jeśli nie zostanie podany, pliki są zapisywane w tym samym katalogu co skrypt. Przykład: -dst "C:\Moja Muzyka\Pobrane"
+-dst DIRECTORY Specifies the destination directory where all downloaded files will be saved. If not provided, files are saved in the same directory as the script. Example: -dst "C:\My Music\Downloads"
 
---overwrite Wymusza nadpisanie istniejących plików. Przekazuje flagę --force-overwrite do yt-dlp, zapewniając ponowne pobranie i nadpisanie plików. Ta opcja jest automatycznie włączana podczas używania trybu wsadowego (-b).
+--overwrite Forces overwriting of existing files. Passes the --force-overwrite flag to yt-dlp, ensuring files are re-downloaded and overwritten. This option is automatically enabled when using batch mode (-b).
 
-Opcje Formatu (Wybierz jedną)
--mp3fast (Domyślna) Jest to tryb domyślny. Pobiera najlepszy dostępny strumień audio i używa ffmpeg do konwersji na wysokiej jakości MP3 VBR (Variable Bitrate). Zapewnia doskonałą jakość i jest bardzo szybki.
+Format Options (Choose one)
+-mp3fast (Default) This is the default mode. It downloads the best available audio stream and uses ffmpeg to convert it to a high-quality VBR (Variable Bitrate) MP3. It provides excellent quality and is very fast.
 
--mp3128 Pobiera najlepsze audio i ponownie koduje je jako MP3 CBR (Constant Bitrate) 128 kbps. Użyj tej opcji, jeśli rozmiar pliku jest głównym problemem.
+-mp3128 Downloads the best audio and re-encodes it as a 128 kbps CBR (Constant Bitrate) MP3. Use this option if file size is a major concern.
 
--mp4fast Pobiera pełne wideo. Znajduje najlepszy dostępny strumień wideo i najlepszy dostępny strumień audio, a następnie remuksuje (łączy) je w pojedynczy plik .mp4 bez ponownego kodowania. Najszybszy sposób na pobranie pliku wideo.
+-mp4fast Downloads the full video. It finds the best available video stream and the best available audio stream, then remuxes (combines) them into a single .mp4 file without re-encoding. The fastest way to download a video file.
 
-Opcje Antyblokujące i Sieciowe
---cookies BROWSER Jest to najskuteczniejsza metoda omijania błędów YouTube, błędów "403 Forbidden", ograniczeń wiekowych i ograniczania prędkości. Informuje yt-dlp, aby użył plików cookie z Twojej zalogowanej przeglądarki.
+Anti-Blocking and Network Options
+--cookies BROWSER This is the most effective method for bypassing YouTube errors, "403 Forbidden" errors, age restrictions, and speed throttling. It tells yt-dlp to use cookies from your logged-in browser.
 
-BROWSER może być: chrome, firefox, edge, brave, opera, safari itp.
+BROWSER can be: chrome, firefox, edge, brave, opera, safari, etc.
 
-Dla zaawansowanych użytkowników z wieloma profilami przeglądarki, można określić jeden, np. --cookies "firefox:default-release" Przykład: --cookies chrome
+For advanced users with multiple browser profiles, you can specify one, e.g., --cookies "firefox:default-release" Example: --cookies chrome
 
--r RATE, --limit-rate RATE Ogranicza maksymalną prędkość pobierania. Przydatne, aby uniknąć wykrycia lub przeciążenia połączenia internetowego. Przykład: -r 500K (dla 500 KB/s), -r 2M (dla 2 MB/s)
+-r RATE, --limit-rate RATE Limits the maximum download speed. Useful to avoid detection or overloading your internet connection. Example: -r 500K (for 500 KB/s), -r 2M (for 2 MB/s)
 
---add-header Dodaje standardowy nagłówek "User-Agent" przeglądarki do żądania pobierania. Spróbuj tej opcji, jeśli standardowe pobieranie zawiedzie. Nie używaj jednocześnie z --add-android.
+--add-header Adds a standard browser "User-Agent" header to the download request. Try this option if standard downloading fails. Do not use simultaneously with --add-android.
 
---add-android Informuje yt-dlp, aby naśladował żądanie z oficjalnej aplikacji YouTube na Androida. Często skuteczny w omijaniu ograniczeń. Nie używaj jednocześnie z --add-header.
+--add-android Tells yt-dlp to mimic a request from the official YouTube Android app. Often effective in bypassing restrictions. Do not use simultaneously with --add-header.
 
-Opcje Trybu Wyświetlania (Wybierz jedną)
-(Domyślny) Normalny tryb wyjścia. Pokazuje niezbędne komunikaty, postęp pobierania ([download] ...%) i postęp konwersji (Converting to mp3: ...%). Nie pokazuje szczegółowych komunikatów [youtube] ani [info].
+Display Mode Options (Choose one)
+(Default) Normal output mode. Shows necessary messages, download progress ([download] ...%), and conversion progress (Converting to mp3: ...%). Does not show detailed [youtube] or [info] messages.
 
---pb Podobny do trybu domyślnego, ale stara się pokazać bardziej szczegółowy pasek postępu yt-dlp, jeśli to możliwe (rozmiar, prędkość, ETA).
+--pb Similar to the default mode, but tries to show a more detailed yt-dlp progress bar if possible (size, speed, ETA).
 
---min Tryb minimalny. Wyświetla tylko jedną, dynamicznie aktualizowaną linię na plik, pokazującą bieżący status (np. Downloading, Converting) i procenty. Kończy się linią podsumowania dla każdego pliku (czasy, rozmiar).
+--min Minimal mode. Displays only a single, dynamically updated line per file, showing the current status (e.g., Downloading, Converting) and percentage. Ends with a summary line for each file (times, size).
 
--b, --batch Tryb cichy (wsadowy). Nie generuje żadnych danych wyjściowych na konsoli (logowanie nadal działa). Automatycznie włącza --overwrite. Idealny do skryptów. Skrypt zwraca kod wyjścia: 0 dla pełnego sukcesu lub N (N > 0) wskazujące liczbę plików, które zawiodły.
+-b, --batch Silent (batch) mode. Generates no console output (logging still works). Automatically enables --overwrite. Ideal for scripts. The script returns an exit code: 0 for full success, or N (N > 0) indicating the number of files that failed.
 
-Opcje Narzędziowe
---color Wymusza kolorowe wyjście w terminalu (przydatne, jeśli nie jest domyślnie włączone). Ta opcja jest ignorowana w trybach --batch i --min.
+Utility Options
+--color Forces colored output in the terminal (useful if not enabled by default). This option is ignored in --batch and --min modes.
 
---log [FILENAME] Tworzy plik dziennika (domyślnie: yt-dlp.log) w katalogu skryptu. Wszystkie dane wyjściowe, w tym błędy i informacje debugowania (jeśli włączone), zostaną zapisane w tym pliku. Przykład: --log moj_log_pobierania.txt
+--log [FILENAME] Creates a log file (default: yt-dlp.log) in the script's directory. All output, including errors and debug information (if enabled), will be saved to this file. Example: --log my_download_log.txt
 
---debug Włącza tryb szczegółowy (verbose). Drukuje wszystkie surowe, szczegółowe dane wyjściowe z poleceń yt-dlp i ffmpeg. Niezbędne do rozwiązywania problemów. Ta opcja jest ignorowana w trybach --batch i --min.
+--debug Enables verbose mode. Prints all raw, detailed output from the yt-dlp and ffmpeg commands. Essential for troubleshooting. This option is ignored in --batch and --min modes.
 
-## 5. PRZYKŁADY
+## 5. EXAMPLES
 
-Oto 10 przykładów obejmujących różne scenariusze.
+Here are 10 examples covering various scenarios.
 
-Przykład 1: Podstawowe pobieranie audio (Domyślne) Pobiera pojedynczy utwór jako wysokiej jakości plik MP3 przy użyciu ustawień domyślnych.
+Example 1: Basic Audio Download (Default) Downloads a single song as a high-quality MP3 file using default settings.
 
 python yt_extractor.py "[https://www.youtube.com/watch?v=dQw4w9WgXcQ](https://www.youtube.com/watch?v=dQw4w9WgXcQ)"
-Przykład 2: Pobieranie pełnego wideo (Najszybsze) Pobiera najlepsze wideo i audio, szybko łącząc je w plik MP4.
+Example 2: Full Video Download (Fastest) Downloads the best video and audio, quickly combining them into an MP4 file.
 
 python yt_extractor.py -mp4fast "[https://www.youtube.com/watch?v=VIDEO_ID_HERE](https://www.youtube.com/watch?v=VIDEO_ID_HERE)"
-Przykład 3: Zalecane "bezpieczne" pobieranie (Używanie plików cookie) Najlepsza metoda unikania większości błędów (403, ograniczenia wiekowe). Używa plików cookie Chrome.
+Example 3: Recommended "Safe" Download (Using Cookies) The best method for avoiding most errors (403, age restrictions). Uses Chrome cookies.
 
 python yt_extractor.py --cookies chrome "[https://www.youtube.com/watch?v=AGE_RESTRICTED_ID](https://www.youtube.com/watch?v=AGE_RESTRICTED_ID)"
 
-Przykład 4: Przetwarzanie wsadowe listy do określonego folderu Pobiera wszystkie adresy URL z "moja_playlista.txt" jako domyślne pliki MP3 do folderu "Moja Muzyka".
+Example 4: Batch Processing a List to a Specific Folder Downloads all URLs from "my_playlist.txt" as default MP3 files to the "My Music" folder.
 
-python yt_extractor.py --list "moja_playlista.txt" -dst "C:\Users\MojUzytkownik\Music"
-Przykład 5: Wiele adresów URL, mniejszy rozmiar pliku (128kbps MP3) Pobiera dwa określone adresy URL jako mniejsze pliki MP3 128 kbps i umieszcza je w podfolderze "Podcasty".
+python yt_extractor.py --list "my_playlist.txt" -dst "C:\Users\MyUser\Music"
+Example 5: Multiple URLs, Smaller File Size (128kbps MP3) Downloads two specific URLs as smaller 128 kbps MP3 files and places them in the "Podcasts" subfolder.
 
-python yt_extractor.py -mp3128 -dst "./Podcasty" "URL_1" "URL_2"
-Przykład 6: Niestandardowa nazwa pliku i wymuszone nadpisanie Pobiera pojedyncze wideo jako MP4, nazywa je "MojeWideo.mp4" i wymusza nadpisanie, jeśli już istnieje.
+python yt_extractor.py -mp3128 -dst "./Podcasts" "URL_1" "URL_2"
+Example 6: Custom Filename and Forced Overwrite Downloads a single video as an MP4, names it "MyVideo.mp4", and forces an overwrite if it already exists.
 
-python yt_extractor.py -mp4fast -o "MojeWideo.mp4" --overwrite "URL_VIDEO"
-Przykład 7: Minimalny postęp dla listy Pobiera wszystkie adresy URL z "linki.txt" jako domyślne pliki MP3, pokazując tylko jednolinijkowe minimalne aktualizacje postępu.
+python yt_extractor.py -mp4fast -o "MyVideo.mp4" --overwrite "URL_VIDEO"
+Example 7: Minimal Progress for a List Downloads all URLs from "links.txt" as default MP3 files, showing only single-line minimal progress updates.
 
-python yt_extractor.py --list "linki.txt" --min
-Przykład 8: Cicha praca wsadowa z logowaniem Pobiera adresy URL z "lista_pracy.txt" całkowicie cicho (-b), zapisując wszystkie logi do "log_pracy.txt". Sprawdź kod wyjścia systemu po zakończeniu, aby zobaczyć liczbę błędów.
+python yt_extractor.py --list "links.txt" --min
+Example 8: Silent Batch Job with Logging Downloads URLs from "work_list.txt" completely silently (-b), saving all logs to "work_log.txt". Check the system exit code after completion to see the number of errors.
 
-python yt_extractor.py --list "lista_pracy.txt" -b --log "log_pracy.txt"
+python yt_extractor.py --list "work_list.txt" -b --log "work_log.txt"
 
-# W systemie Linux/macOS: echo $?
+# On Linux/macOS: echo $?
 
-# W systemie Windows: echo %ERRORLEVEL%
+# On Windows: echo %ERRORLEVEL%
 
-Przykład 9: Alternatywna strategia z ograniczeniem prędkości Jeśli standardowe pobieranie zawiedzie, spróbuj użyć symulacji klienta Android i ogranicz prędkość do 1 MB/s, aby wyglądać mniej agresywnie.
+Example 9: Alternative Strategy with Rate Limiting If standard download fails, try using an Android client simulation and limit the speed to 1 MB/s to appear less aggressive.
 
 python yt_extractor.py --add-android -r 1M "[https://www.youtube.com/watch?v=STUBBORN_ID](https://www.youtube.com/watch?v=STUBBORN_ID)"
-Przykład 10: Pobieranie audio z określoną nazwą wyjściową i debugowaniem Pobiera pojedynczy plik audio, nadaje mu konkretną nazwę, włącza kolory i pokazuje wszystkie szczegółowe dane wyjściowe debugowania z yt-dlp/ffmpeg.
+Example 10: Audio Download with Specific Output Name and Debugging Downloads a single audio file, gives it a specific name, enables colors, and shows all detailed debug output from yt-dlp/ffmpeg.
 
-python yt_extractor.py -o "KonkretnyUtwor.mp3" --color --debug "URL_SONG"
+python yt_extractor.py -o "SpecificSong.mp3" --color --debug "URL_SONG"
 
-## 6. ROZWIĄZYWANIE PROBLEMÓW I NAJLEPSZE PRAKTYKI
+## 6. TROUBLESHOOTING AND BEST PRACTICES
 
-"ERROR: ... 403: Forbidden" lub "Age-Restricted"
+"ERROR: ... 403: Forbidden" or "Age-Restricted"
 
-Rozwiązanie: Użyj opcji --cookies BROWSER. Rozwiązuje to problem w 99% przypadków.
+Solution: Use the --cookies BROWSER option. This solves the problem in 99% of cases.
 
-Skrypt zawodzi przy WSZYSTKICH pobraniach (nawet prostych)
+The script fails on ALL downloads (even simple ones)
 
-Rozwiązanie: Twoje yt-dlp jest przestarzałe. YouTube zmienia kod swojej strony, a yt-dlp musi być zaktualizowane, aby pasowało. Uruchom yt-dlp -U w linii poleceń. Rób to regularnie.
+Solution: Your yt-dlp is outdated. YouTube changes its site code, and yt-dlp must be updated to match. Run yt-dlp -U in your command line. Do this regularly.
 
-"ffmpeg: command not found" lub "ffprobe: command not found"
+"ffmpeg: command not found" or "ffprobe: command not found"
 
-Rozwiązanie: ffmpeg i ffprobe nie znajdują się w systemowej zmiennej PATH. Musisz je pobrać z ffmpeg.org i umieścić w katalogu, który znajduje się w Twojej zmiennej PATH, lub dodać ich lokalizację do zmiennej środowiskowej PATH.
+Solution: ffmpeg and ffprobe are not in your system's PATH. You need to download them from ffmpeg.org and place them in a directory that is in your PATH, or add their location to your PATH environment variable.
 
-Adresy URL z & (jak playlisty) powodują błędy!
+URLs with & (like playlists) cause errors!
 
-Rozwiązanie: Zapomniałeś umieścić URL w podwójnych cudzysłowach (" "). NIEPOPRAWNIE: python yt_extractor.py https://...&list=... POPRAWNIE: python yt_extractor.py "https://...&list=..."
+Solution: You forgot to enclose the URL in double quotes (" "). INCORRECT: python yt_extractor.py https://...&list=... CORRECT: python yt_extractor.py "https://...&list=..."
 
-Wideo nadal się nie pobiera, nawet z plikami cookie.
+The video still won't download, even with cookies.
 
-Rozwiązanie: Wypróbuj alternatywne strategie pobierania: --add-header lub --add-android. Używaj tylko jednej z nich na raz.
+Solution: Try alternative download strategies: --add-header or --add-android. Use only one at a time.
 
-Nadpisywanie (--overwrite) wydaje się nie działać.
+Overwriting (--overwrite) doesn't seem to work.
 
-Rozwiązanie: Upewnij się, że używasz flagi --overwrite. Przekazuje ona --force-overwrite do yt-dlp. Sprawdź, czy nie ma literówek. Tryb wsadowy (-b) automatycznie włącza tę opcję.
+Solution: Make sure you are using the --overwrite flag. It passes --force-overwrite to yt-dlp. Check for typos. Batch mode (-b) automatically enables this option.
 
-## 7. LICENCJA
+## 7. LICENSE
 
 MIT License
