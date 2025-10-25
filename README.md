@@ -1,7 +1,6 @@
 # YouTube Audio & Video Extractor (v1.12)
 
 **Author:** Igor Brzezek (igor.brzezek@gmail.com)
-**GitHub:** https://github.com/IgorBrzezek/yt-audio-download
 **Version:** 1.12
 
 ---
