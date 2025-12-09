@@ -3,7 +3,7 @@
 
 """
 =======================================
-YouTube Audio & Video Extractor (v1.17)
+YouTube Audio & Video Extractor (v1.16)
 =======================================
 
 Info:
@@ -62,7 +62,7 @@ EXAMPLES:
   python yt_avextractor.py --list "links.txt" --min
   
 CHANGELOG:
-Added --skip option to skip downloading files that are already downloaded.
+
   
 """
 

@@ -1,10 +1,10 @@
 ===========================================
-  YouTube Audio & Video Extractor (v1.15)
+  YouTube Audio & Video Extractor (v1.17)
 ============================================
 
 Author: Igor Brzezek (igor.brzezek@gmail.com)
 GitHub: https://github.com/IgorBrzezek
-Version: 1.13
+Version: 1.17
 
 
 -------------------
@@ -92,6 +92,12 @@ Here is a breakdown of every available command-line option, grouped by category.
     should have one URL per line. Do NOT use quotes around the URLs
     inside the file.
     Example: --list "links.txt"
+
+  --skip
+    When used with --list, this option tells the script to automatically
+    skip any files that already exist in the destination directory,
+    without asking for confirmation. This is useful for resuming
+    interrupted batch downloads or only downloading new content.
 
   -dst DIRECTORY
     Specifies the destination directory where all downloaded files

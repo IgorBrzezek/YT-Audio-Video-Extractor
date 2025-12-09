@@ -1,7 +1,7 @@
-# YouTube Audio & Video Extractor (v1.15)
+# YouTube Audio & Video Extractor (v1.17)
 
 **Author:** Igor Brzezek (igor.brzezek@gmail.com)
-**Version:** 1.15
+**Version:** 1.17
 
 ---
 
@@ -70,6 +70,8 @@ urls (Positional) One or more YouTube video URLs, separated by spaces. This argu
 -o FILENAME, --output FILENAME Specifies a custom output filename. IMPORTANT: This option ONLY works when downloading a SINGLE URL. It will be ignored if you provide multiple URLs or use a list. Example: -o "My File Name.mp3"
 
 --list FILE Path to a text file containing a list of URLs to process. The file should contain one URL per line. DO NOT use quotes around the URLs inside the file. Example: --list "links.txt"
+
+--skip When used with --list, this option tells the script to automatically skip any files that already exist in the destination directory, without asking for confirmation. This is useful for resuming interrupted batch downloads or only downloading new content.
 
 -dst DIRECTORY Specifies the destination directory where all downloaded files will be saved. If not provided, files are saved in the same directory as the script. Example: -dst "C:\My Music\Downloads"
 
