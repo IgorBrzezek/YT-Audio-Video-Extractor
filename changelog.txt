@@ -1,0 +1,27 @@
+=======================================
+YouTube Audio & Video Extractor CHANGELOG
+=======================================
+
+Version: 1.18
+Date: 12.01.2026
+---------------------------------------
+NEW FEATURES & IMPROVEMENTS:
+* Added -mp3fast option: Allows for quick extraction to 128kbps CBR MP3 format.
+* UI Stability (Static Interface): Modified progress handlers to update status lines in-place using carriage returns (\r) and ANSI escape codes (\033[K). This prevents the terminal from scrolling excessively during download and conversion.
+* Optimized Short Help: Re-engineered the -h/--short-help command to display version info and all available flags in a single, concise line for better readability.
+v1.18p11:
+* Implemented robust SIGINT (Ctrl+C) handling to instantly terminate subprocess trees (yt-dlp/ffmpeg) and prevent orphaned processes.
+* Added automatic cleanup of incomplete/temporary files upon user abortion or conversion failure.
+* Forced system stdout to reconfigure to 'utf-8' to ensure proper rendering of special characters in video titles.
+
+Version: 1.17
+Date: 09.12.2025
+---------------------------------------
+* Added --skip option: Enables skipping of files that already exist in the destination directory when processing a URL list.
+
+Version: 1.0 (Original)
+Date: 15.10.2025
+---------------------------------------
+* Initial release of the YouTube Audio Extractor.
+* Support for high-quality MP3 extraction via yt-dlp and ffmpeg.
+* Basic command-line interface for single URLs and list files.
