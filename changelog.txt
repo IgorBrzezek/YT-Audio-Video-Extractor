@@ -2,6 +2,44 @@
 YouTube Audio & Video Extractor CHANGELOG
 =======================================
 
+Version: 1.19
+Date: 21.01.2026
+---------------------------------------
+NEW FEATURES & IMPROVEMENTS:
+*   **Extended Audio Formats:**
+    *   Added `-mp3slow` option for high-quality MP3 (VBR 196kbps).
+    *   Added `-mono` option for space-saving mono MP3 (VBR 96kbps).
+*   **Extended Video Formats:**
+    *   Introduced `-mp41080` for 1080p video downloads.
+    *   Introduced `-mp4480` for 480p video downloads.
+*   **Enhanced Output Modes:**
+    *   Added `--compact` mode for a compact view when using `--list`.
+    *   Implemented `--summarize` to display a comprehensive summary after all batch downloads are completed.
+    *   Added `--title` option to show the title of each downloaded item when using `--list`.
+*   **Improved Concurrency & Reliability:**
+    *   Added `-t/--threads` option to specify the number of threads for FFmpeg compression.
+    *   Implemented `-ret/--retries` option to allow automatic retries for failed downloads.
+*   **Interactive Overwrite Prompt:** Introduced an interactive prompt (`[y/N/a/q]`) to handle existing files, allowing users to choose to overwrite, skip, overwrite all, or quit.
+*   **Global State Management:** Refactored global variables to better manage download and conversion progress.
+*   **Progress Reporting:**
+    *   `show_minimal_status` now intelligently adapts its output for the new `--compact` mode.
+    *   Download and conversion progress handlers updated for better video/audio stream distinctions.
+*   **Speed and Size Calculation:**
+    *   New utility functions `speed_to_bytes_per_second` and `size_to_bytes` for more robust calculations.
+*   **Argument Parsing:**
+    *   Help message descriptions for `-h` and `--help` were swapped for better clarity.
+    *   Grouped format options into 'Format (Audio)' and 'Format (Video)' for better organization.
+*   **FFmpeg Audio Quality Control:** Switched to using `-q:a` (VBR quality) for MP3 encoding.
+*   **Dynamic Video Format Selection:** Implemented dynamic selection based on `-mp4fast`, `-mp41080`, and `-mp4480` options.
+*   **Error Reporting:** Improved error reporting context, especially with the introduction of retries.
+
+BUG FIXES:
+*   Fixed an issue where the `--skip` and `--overwrite` options might not behave as expected in all scenarios by integrating the new interactive overwrite logic and making their behavior more explicit ("without asking").
+
+REFACTORING:
+*   **Code Structure:** Introduced `DownloadState` class to encapsulate stream-specific download state.
+*   **`run_command` Function:** Modified to accept additional keyword arguments for custom handlers.
+
 Version: 1.18
 Date: 12.01.2026
 ---------------------------------------
