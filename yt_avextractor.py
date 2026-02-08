@@ -402,8 +402,11 @@ def run_command(command, args, custom_handler=None, **handler_kwargs):
             if args.log and not is_progress:
                 logging.info(clean_line)
 
-            if (args.verbose or args.debug) and not is_progress:
-                sys.stdout.write(f"\r\033[K{Colors.C_DIM}[DEBUG] {clean_line}{Colors.ENDC}\n")
+            is_error = "ERROR:" in clean_line or "WARNING:" in clean_line
+            if (args.verbose or args.debug or is_error) and not is_progress:
+                msg_color = Colors.FAIL if "ERROR:" in clean_line else (Colors.WARNING if "WARNING:" in clean_line else Colors.C_DIM)
+                prefix = "" if is_error else "[DEBUG] "
+                sys.stdout.write(f"\r\033[K{msg_color}{prefix}{clean_line}{Colors.ENDC}\n")
                 sys.stdout.flush()
 
             if custom_handler:
@@ -734,6 +737,8 @@ def main():
                         ff_state = {'total_size': '0', 'out_time': '0:00:00', 'out_time_us': '0', 'last_update': 0}
                         if run_command(cv_cmd, args, custom_handler=conversion_progress_handler, total_duration=duration, i=i, total=len(urls), state=ff_state, title=video_title):
                             finish_summary(start_time, args, i, len(urls), title=video_title, final_filepath=final_filepath)
+                            try: os.remove(actual_input)
+                            except: pass
                             break
                         else:
                             if attempt < args.retries - 1:
