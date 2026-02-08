@@ -88,6 +88,10 @@ Before running the script, you **MUST** have the following tools installed and a
     *   ```cmd
         winget install yt-dlp
         ```
+    *   Install with Python
+    *   ```bash/cmd
+        python3 -m pip install -U "yt-dlp[default]"
+        ``` 
     *   **CRITICAL:** YouTube frequently changes its site. You MUST keep `yt-dlp` up to date.
         Run this command regularly:
         ```bash
