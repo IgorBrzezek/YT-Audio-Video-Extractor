@@ -83,10 +83,16 @@ Before running the script, you **MUST** have the following tools installed and a
 2.  **yt-dlp:**
     *   This is the main download engine.
     *   Download from here: [https://github.com/yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp)
+    *   Or:
+    *   Instal (on Windows): winget install yt-dlp
     *   **CRITICAL:** YouTube frequently changes its site. You MUST keep `yt-dlp` up to date.
         Run this command regularly:
         ```bash
         yt-dlp -U
+        ```
+        For Windows:
+        ```cmd
+        winget upgrade yt-dlp
         ```
 
 3.  **ffmpeg & ffprobe:**
