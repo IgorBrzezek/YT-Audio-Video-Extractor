@@ -1,7 +1,7 @@
-# YouTube Audio & Video Extractor (v1.19)
+# YouTube Audio & Video Extractor (v1.20)
 
 **Author:** Igor Brzezek (igor.brzezek@gmail.com)
-**Version:** 1.19
+**Version:** 1.20
 **GitHub:** https://github.com/IgorBrzezek/yt-audio-download
 
 ---
@@ -20,7 +20,39 @@ Failed or incomplete downloads are meticulously logged to `ytextractor.err` for 
 
 ---
 
-## 2. CHANGELOG (v1.19)
+## 2. CHANGELOG
+
+### Version 1.20 (2026-02-08)
+
+#### New Features
+
+*   **yt-dlp Management Options:**
+    *   Added `--dlver` to display current yt-dlp version.
+    *   Added `--dlchk` to check the latest yt-dlp version available online.
+    *   Added `--dlupg` to update yt-dlp to the latest version (OS-specific: Windows/Linux/macOS).
+*   **Single-Line Progress Display:**
+    *   Implemented unified progress format: `File M/N | Downloading: ... | Converting: ... | Summary`
+    *   Consolidates download progress, conversion progress, and completion summary on one line.
+    *   Provides clearer status updates with `|` separators for better readability.
+*   **Improved Temporary File Management:**
+    *   All temporary files now use `ytextr_tmp_` prefix for easy identification.
+    *   Automatic cleanup of leftover temporary files at script startup.
+    *   Enhanced cleanup during normal operation to prevent file buildup.
+*   **Language Standardization:**
+    *   All code comments, docstrings, and user-facing messages translated to English.
+    *   Consistent English language throughout the entire codebase.
+
+#### Bug Fixes
+
+*   **Fixed File Overwrite Bug:** When user selected 'y' (yes) or 'a' (all) in the interactive overwrite prompt, existing files were not being deleted before download, causing overwrites to fail. Now properly deletes existing files before re-downloading.
+*   **Fixed FFmpeg 'N/A' Error:** Added error handling for cases where FFmpeg returns 'N/A' values during conversion progress, preventing script crashes.
+
+#### Refactoring
+
+*   **Code Organization:** Improved structure of yt-dlp management functions with better error handling.
+*   **Progress Handlers:** Consolidated download and conversion progress into single-line format for cleaner output.
+
+---
 
 ### Version 1.19 (2026-01-21)
 
@@ -204,6 +236,14 @@ Below is a description of all available command-line options, grouped by categor
     Specifies the number of threads for FFmpeg compression (default: 1). Useful for speeding up audio conversions on multi-core processors.
 -   `-ret, --retries`
     Number of retries for a failed download (default: 1). Increases robustness against transient network issues.
+
+### yt-dlp Management
+-   `--dlver`
+    Shows the current yt-dlp version being used by the script.
+-   `--dlchk`
+    Checks the latest yt-dlp version available online from GitHub.
+-   `--dlupg`
+    Updates yt-dlp to the latest version (OS-specific method: Windows/Linux/macOS).
 
 ---
 

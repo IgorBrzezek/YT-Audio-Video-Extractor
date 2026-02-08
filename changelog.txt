@@ -2,6 +2,34 @@
 YouTube Audio & Video Extractor CHANGELOG
 =======================================
 
+Version: 1.20
+Date: 08.02.2026
+---------------------------------------
+NEW FEATURES & IMPROVEMENTS:
+*   **yt-dlp Management Options:**
+    *   Added `--dlver` to display current yt-dlp version.
+    *   Added `--dlchk` to check the latest yt-dlp version available online.
+    *   Added `--dlupg` to update yt-dlp to the latest version (OS-specific).
+*   **Single-Line Progress Display:**
+    *   Implemented unified progress format: `File M/N | Downloading: ... | Converting: ... | Summary`
+    *   Consolidates download progress, conversion progress, and completion summary on one line.
+    *   Provides clearer status updates with `|` separators for better readability.
+*   **Improved Temporary File Management:**
+    *   All temporary files now use `ytextr_tmp_` prefix for easy identification.
+    *   Automatic cleanup of leftover temporary files at script startup.
+    *   Enhanced cleanup during normal operation to prevent file buildup.
+*   **Language Standardization:**
+    *   All code comments, docstrings, and user-facing messages translated to English.
+    *   Consistent English language throughout the entire codebase.
+
+BUG FIXES:
+*   **Fixed File Overwrite Bug:** When user selected 'y' (yes) or 'a' (all) in the interactive overwrite prompt, existing files were not being deleted before download, causing overwrites to fail. Now properly deletes existing files before re-downloading.
+*   **Fixed FFmpeg 'N/A' Error:** Added error handling for cases where FFmpeg returns 'N/A' values during conversion progress, preventing script crashes.
+
+REFACTORING:
+*   **Code Organization:** Improved structure of yt-dlp management functions with better error handling.
+*   **Progress Handlers:** Consolidated download and conversion progress into single-line format for cleaner output.
+
 Version: 1.19
 Date: 21.01.2026
 ---------------------------------------

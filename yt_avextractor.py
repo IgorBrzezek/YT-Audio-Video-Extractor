@@ -3,20 +3,20 @@
 
 """
 =======================================
-YouTube Audio & Video Extractor (v1.19)
+YouTube Audio & Video Extractor (v1.20)
 =======================================
 
 Info:
   Author: Igor Brzezek (igor.brzezek@gmail.com)
   GitHub: https://github.com/IgorBrzezek/yt-audio-download
-  Version: 1.19
-  Date: 21.01.2026
+  Version: 1.20
+  Date: 08.02.2026
 
 LICENSE:
   MIT License
 
 CHANGELOG:
-Version 1.19 (2026-01-21)
+Version 1.20 (2026-02-08)
 
 New Features
 
@@ -112,7 +112,7 @@ else:
         WARNING = Fore.YELLOW; FAIL = Fore.RED; ENDC = Style.RESET_ALL; BOLD = Style.BRIGHT; UNDERLINE = '\033[4m'
         C_DIM = '\033[2m'; C_YELLOW = Fore.YELLOW; C_MAGENTA = Fore.MAGENTA; C_WHITE = Fore.WHITE
 
-AUTHOR = 'Igor Brzezek'; VERSION = "1.19"; DATE = '21.01.2026'
+AUTHOR = 'Igor Brzezek'; VERSION = "1.20"; DATE = '08.02.2026'
 USER_AGENT_HEADER = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, browser: chrome) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 
 class DownloadState:
@@ -275,7 +275,65 @@ def create_arg_parser():
     util_group.add_argument('-t', '--threads', type=int, default=1, help="Number of threads for compression (default: 1).")
     util_group.add_argument('-ret', '--retries', type=int, default=1, help="Number of retries for a failed download (default: 1).")
 
+    ytdlp_group = parser.add_argument_group('yt-dlp Management')
+    ytdlp_group.add_argument('--dlver', action='store_true', help="Show current yt-dlp version used by this script.")
+    ytdlp_group.add_argument('--dlchk', action='store_true', help="Check latest yt-dlp version available online.")
+    ytdlp_group.add_argument('--dlupg', action='store_true', help="Update yt-dlp to latest version (OS-specific).")
+
     return parser
+
+def get_ytdlp_version():
+    """Get the current installed yt-dlp version."""
+    try:
+        result = subprocess.check_output(['yt-dlp', '--version'], stderr=subprocess.DEVNULL, universal_newlines=True)
+        return result.strip()
+    except Exception as e:
+        return f"Error: cannot get version ({e})"
+
+def check_ytdlp_latest_version():
+    """Check the latest available yt-dlp version online."""
+    try:
+        import urllib.request
+        url = 'https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest'
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=10) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            return data.get('tag_name', 'Unknown')
+    except Exception as e:
+        return f"Error: cannot check online version ({e})"
+
+def update_ytdlp():
+    """Update yt-dlp to the latest version (OS-specific)."""
+    platform = sys.platform
+    try:
+        if platform == 'win32':
+            # Windows: use pip or yt-dlp -U
+            print("Updating yt-dlp for Windows...")
+            result = subprocess.run(['yt-dlp', '-U'], capture_output=True, text=True)
+            if result.returncode != 0:
+                # Fallback to pip
+                print("Trying to update via pip...")
+                result = subprocess.run([sys.executable, '-m', 'pip', 'install', '--upgrade', 'yt-dlp'], 
+                                      capture_output=True, text=True)
+            print(result.stdout)
+            if result.returncode == 0:
+                print(f"{Colors.OKGREEN}Update completed successfully.{Colors.ENDC}")
+            else:
+                print(f"{Colors.FAIL}Error during update: {result.stderr}{Colors.ENDC}")
+        elif platform.startswith('linux') or platform == 'darwin':
+            # Linux/Mac: use pip
+            print(f"Updating yt-dlp for {'Linux' if platform.startswith('linux') else 'macOS'}...")
+            result = subprocess.run([sys.executable, '-m', 'pip', 'install', '--upgrade', 'yt-dlp'], 
+                                  capture_output=True, text=True)
+            print(result.stdout)
+            if result.returncode == 0:
+                print(f"{Colors.OKGREEN}Update completed successfully.{Colors.ENDC}")
+            else:
+                print(f"{Colors.FAIL}Error during update: {result.stderr}{Colors.ENDC}")
+        else:
+            print(f"{Colors.WARNING}Unsupported operating system: {platform}{Colors.ENDC}")
+    except Exception as e:
+        print(f"{Colors.FAIL}Error during update: {e}{Colors.ENDC}")
 
 def print_help(parser, detailed=False):
     if not detailed:
@@ -303,6 +361,17 @@ def print_help(parser, detailed=False):
         print("  python yt_avextractor.py -mono -t 4 \"URL\"")
         print("  python yt_avextractor.py -mp41080 --color \"URL\"")
     sys.exit(0)
+
+def cleanup_temp_files(destination_dir):
+    """Clean up all temporary files with ytextr_tmp_ prefix at startup."""
+    try:
+        for temp_file in destination_dir.glob('ytextr_tmp_*'):
+            try:
+                os.remove(temp_file)
+            except:
+                pass
+    except:
+        pass
 
 def cleanup_incomplete_files():
     for filepath in current_files_to_cleanup:
@@ -369,30 +438,24 @@ def download_progress_handler(line, args, i, total, title="", is_video=False, do
                 else: # This means it's now downloading audio for a video (merged format)
                     AUDIO_PROGRESS = progress
             else: # Audio-only download
-                AUDIO_PROGRESS = f"Audio: {progress}"
+                AUDIO_PROGRESS = progress
 
-            if IS_COMPACT_MODE:
-                if is_video:
-                    current_download_display = f"video: {VIDEO_PROGRESS} | audio: {AUDIO_PROGRESS}"
-                else:
-                    current_download_display = f"{AUDIO_PROGRESS}"
-                
-                prefix_colored = f"{Colors.BOLD}{Colors.OKBLUE}{_COMPACT_FILE_PREFIX}{Colors.ENDC}: " if args.color else f"{_COMPACT_FILE_PREFIX}: "
-                
-                full_line = f"{prefix_colored}Downloading: {current_download_display}"
-                sys.stdout.write(f"\r\033[K{full_line}")
-            elif args.min: # args.min without compact (original minimal mode)
-                if is_video:
-                    status = f"Downloading video: {VIDEO_PROGRESS} | {AUDIO_PROGRESS}"
-                else:
-                    status = f"Downloading audio: {AUDIO_PROGRESS}"
-                show_minimal_status(i, total, status, args.color, title=title, title_limit=args.showname)
-            else: # Non-minimal mode, print full lines
-                if is_video:
-                    status = f"Downloading video: {VIDEO_PROGRESS} | Downloading audio: {AUDIO_PROGRESS}"
-                else:
-                    status = f"Downloading audio: {AUDIO_PROGRESS}"
-                sys.stdout.write(f"\r\033[K{status}")
+            # Format jednoliniowy: File M/N | Downloading: ... 
+            total_digits = len(str(total))
+            file_part = f"File {str(i).rjust(total_digits)}/{total}"
+            
+            if args.color:
+                file_colored = f"{Colors.BOLD}{Colors.OKBLUE}{file_part}{Colors.ENDC}"
+            else:
+                file_colored = file_part
+            
+            if is_video:
+                download_part = f"Downloading: video: {VIDEO_PROGRESS} | audio: {AUDIO_PROGRESS}"
+            else:
+                download_part = f"Downloading: {AUDIO_PROGRESS}"
+            
+            full_line = f"{file_colored} | {download_part}"
+            sys.stdout.write(f"\r\033[K{full_line}")
             sys.stdout.flush()
 
     elif '[download]' in stripped and '100%' in stripped:
@@ -419,7 +482,12 @@ def conversion_progress_handler(line, args, total_duration, i, total, state, tit
         if (args.min or IS_COMPACT_MODE) and (now - state['last_update'] < 0.1): return
         state['last_update'] = now
         
-        us = int(state.get('out_time_us', '0'))
+        # Zabezpieczenie przed wartością 'N/A' z FFmpeg
+        try:
+            us = int(state.get('out_time_us', '0'))
+        except (ValueError, TypeError):
+            us = 0
+        
         total_bytes_converted_raw = state.get('total_size', '0')
         total_bytes_converted = size_to_bytes(total_bytes_converted_raw)
         
@@ -437,18 +505,24 @@ def conversion_progress_handler(line, args, total_duration, i, total, state, tit
         size_display_str = format_bytes(total_bytes_converted)
         time_str = format_ff_time(state.get('out_time', '0:00:00'))
 
-        status = f"Converting: {Colors.BOLD}{percent:.1f}%{Colors.ENDC} ({Colors.C_YELLOW}{size_display_str}{Colors.ENDC}, {Colors.OKBLUE}{time_str}{Colors.ENDC})" if args.color else f"Converting: {percent:.1f}% ({size_display_str}, {time_str})"
+        convert_status = f"Converting: {Colors.BOLD}{percent:.1f}%{Colors.ENDC} ({Colors.C_YELLOW}{size_display_str}{Colors.ENDC}, {Colors.OKBLUE}{time_str}{Colors.ENDC})" if args.color else f"Converting: {percent:.1f}% ({size_display_str}, {time_str})"
         
-        AUDIO_PROGRESS = status
+        AUDIO_PROGRESS = convert_status
 
-        if IS_COMPACT_MODE:
-            full_status = f"{_COMPACT_LAST_DOWNLOAD_MSG} | {status}"
-            sys.stdout.write(f"\r\033[K{full_status}")
-        elif args.min:
-            full_status = f"{AUDIO_PROGRESS}"
-            show_minimal_status(i, total, full_status, args.color, title=title, title_limit=args.showname)
+        # Format jednoliniowy: File M/N | Downloading: ... | Converting: ...
+        total_digits = len(str(total))
+        file_part = f"File {str(i).rjust(total_digits)}/{total}"
+        
+        if args.color:
+            file_colored = f"{Colors.BOLD}{Colors.OKBLUE}{file_part}{Colors.ENDC}"
         else:
-            sys.stdout.write(f"\r\033[K{AUDIO_PROGRESS}")
+            file_colored = file_part
+        
+        # Zachowaj ostatni stan downloadingu
+        download_part = f"Downloading: {VIDEO_PROGRESS if VIDEO_PROGRESS else 'completed'}" if VIDEO_PROGRESS else f"Downloading: completed"
+        
+        full_line = f"{file_colored} | {download_part} | {convert_status}"
+        sys.stdout.write(f"\r\033[K{full_line}")
         sys.stdout.flush()
 
 def main():
@@ -468,6 +542,23 @@ def main():
     if args.short_help: print_help(parser, detailed=False)
     if args.help: print_help(parser, detailed=True)
 
+    # yt-dlp management options
+    if args.dlver:
+        version = get_ytdlp_version()
+        print(f"yt-dlp version: {version}")
+        sys.exit(0)
+    
+    if args.dlchk:
+        latest = check_ytdlp_latest_version()
+        current = get_ytdlp_version()
+        print(f"Current version: {current}")
+        print(f"Latest version available online: {latest}")
+        sys.exit(0)
+    
+    if args.dlupg:
+        update_ytdlp()
+        sys.exit(0)
+
     if args.summarize and not args.list:
         parser.error("Option --summarize can only be used with --list.")
 
@@ -481,6 +572,10 @@ def main():
 
     destination_dir = Path(args.dst) if args.dst else Path.cwd()
     destination_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Clean up any leftover temporary files from previous runs
+    cleanup_temp_files(destination_dir)
+    
     cprint(f"Found {len(urls)} file(s).", Colors.HEADER, args.color)
 
     error_count = 0
@@ -521,6 +616,54 @@ def main():
             cprint(f"Error: Metadata fetch failed for {url}", Colors.FAIL, args.color, force_print=True);
             failed_urls.append(f"{url} | REASON: Metadata fetch failed.")
             error_count += 1; continue
+        
+        # Check if file already exists and handle accordingly
+        global OVERWRITE_ALL
+        skip_this_file = False
+        if final_filepath.exists():
+            if args.skip:
+                cprint(f"File exists, skipping: {final_filepath.name}", Colors.WARNING, args.color, force_print=True)
+                continue
+            elif args.overwrite or OVERWRITE_ALL:
+                # Silently overwrite - delete existing file first
+                try:
+                    os.remove(final_filepath)
+                except Exception as e:
+                    cprint(f"Error removing existing file: {e}", Colors.FAIL, args.color, force_print=True)
+                    continue
+            else:
+                # Ask user what to do
+                while True:
+                    response = input(f"File exists: {final_filepath.name}. Overwrite? [y/N/a/q]: ").strip().lower()
+                    if response == 'y':
+                        # Delete the file before overwriting
+                        try:
+                            os.remove(final_filepath)
+                        except Exception as e:
+                            cprint(f"Error removing existing file: {e}", Colors.FAIL, args.color, force_print=True)
+                            skip_this_file = True
+                        break  # Overwrite this file
+                    elif response == 'a':
+                        OVERWRITE_ALL = True
+                        # Delete the file before overwriting
+                        try:
+                            os.remove(final_filepath)
+                        except Exception as e:
+                            cprint(f"Error removing existing file: {e}", Colors.FAIL, args.color, force_print=True)
+                            skip_this_file = True
+                        break  # Overwrite all files
+                    elif response == 'q':
+                        cprint("Quitting...", Colors.WARNING, args.color, force_print=True)
+                        sys.exit(0)
+                    elif response == 'n' or response == '':
+                        cprint(f"Skipping: {final_filepath.name}", Colors.WARNING, args.color, force_print=True)
+                        skip_this_file = True
+                        break
+                    else:
+                        print("Invalid choice. Please enter y, N, a, or q.")
+                
+                if skip_this_file:
+                    continue  # Skip this file
         
         if args.min:
             show_minimal_status(i, len(urls), "Connecting...", args.color, Colors.HEADER, title_limit=args.showname)
@@ -563,14 +706,14 @@ def main():
                         failed_urls.append(f"{url} | REASON: Download failed (Video).")
                         error_count += 1
             else:
-                temp_path = destination_dir / f"temp_{os.getpid()}_{i}.%(ext)s"
+                temp_path = destination_dir / f"ytextr_tmp_{os.getpid()}_{i}.%(ext)s"
                 dl_cmd = ['yt-dlp', '--no-warnings', '--progress', '-f', 'bestaudio', '-o', str(temp_path), url]
                 if args.add_header: dl_cmd.extend(['--user-agent', USER_AGENT_HEADER])
                 if args.limit_rate: dl_cmd.extend(['--limit-rate', args.limit_rate])
                 if args.overwrite: dl_cmd.append('--force-overwrites')
                 dl_cmd.extend(['--retries', str(args.retries)])
                 if run_command(dl_cmd, args, custom_handler=download_progress_handler, i=i, total=len(urls), title=video_title, is_video=False, download_state=None):
-                    actual_input = next(destination_dir.glob(f"temp_{os.getpid()}_{i}.*"), None)
+                    actual_input = next(destination_dir.glob(f"ytextr_tmp_{os.getpid()}_{i}.*"), None)
                     if actual_input:
                         current_files_to_cleanup.append(actual_input)
                         duration = video_info.get('duration', 0)
@@ -654,9 +797,12 @@ def finish_summary(start_time, args, i, total, title="", is_video=False, final_f
     if final_filepath and final_filepath.exists():
         try:
             file_size = final_filepath.stat().st_size
-            file_size_str = f" | Size: {format_bytes(file_size)}"
+            file_size_str = f"Size: {format_bytes(file_size)}"
         except: pass
-    msg = f"Summary: Completed in {elapsed:.2f}s{file_size_str}"
+    
+    summary_msg = f"Completed in {elapsed:.2f}s"
+    if file_size_str:
+        summary_msg += f", {file_size_str}"
 
     # Collect data for summary if summarize option is enabled
     global SUMMARY_DATA
@@ -669,22 +815,28 @@ def finish_summary(start_time, args, i, total, title="", is_video=False, final_f
             'compress_speed': current_file_compress_speed_bps
         })
 
-    color_msg = f"{Colors.OKGREEN}{msg}{Colors.ENDC}" if args.color else msg
+    color_summary = f"{Colors.OKGREEN}{summary_msg}{Colors.ENDC}" if args.color else summary_msg
 
-    if args.min or IS_COMPACT_MODE:
-        if IS_COMPACT_MODE:
-            final_status_line = _COMPACT_LAST_DOWNLOAD_MSG
-            if AUDIO_PROGRESS and 'Converting' in AUDIO_PROGRESS: # Check if conversion happened and message exists
-                final_status_line += f" | {AUDIO_PROGRESS}"
-            final_status_line += f" | {color_msg}"
-            sys.stdout.write(f"\r\033[K{final_status_line}\n")
-        else: # args.min
-            if is_video:
-                 sys.stdout.write(f"\r\033[K{show_minimal_status(i, total, '', args.color, title=title, title_limit=args.showname)}{VIDEO_PROGRESS} | {AUDIO_PROGRESS} | {color_msg}\n")
-            else:
-                 sys.stdout.write(f"\r\033[K{show_minimal_status(i, total, '', args.color, title=title, title_limit=args.showname)}{AUDIO_PROGRESS} | {color_msg}\n")
+    # Format jednoliniowy: File M/N | Downloading: ... | Converting: ... | Summary: ...
+    total_digits = len(str(total))
+    file_part = f"File {str(i).rjust(total_digits)}/{total}"
+    
+    if args.color:
+        file_colored = f"{Colors.BOLD}{Colors.OKBLUE}{file_part}{Colors.ENDC}"
     else:
-        cprint(f"\n{msg}", Colors.OKGREEN, args.color)
+        file_colored = file_part
+    
+    # Pokaż ostatni stan downloading
+    download_part = f"Downloading: completed"
+    
+    # Sprawdź czy była konwersja (dla audio)
+    if not is_video and AUDIO_PROGRESS:
+        convert_part = f"Converting: completed"
+        final_line = f"{file_colored} | {download_part} | {convert_part} | {color_summary}"
+    else:
+        final_line = f"{file_colored} | {download_part} | {color_summary}"
+    
+    sys.stdout.write(f"\r\033[K{final_line}\n")
     sys.stdout.flush()
 
 if __name__ == '__main__': main()

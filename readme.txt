@@ -1,52 +1,54 @@
 ===============================================================================
-YouTube Audio & Video Extractor (v1.19)
+YouTube Audio & Video Extractor (v1.20)
 ===============================================================================
 
 Author: Igor Brzezek (igor.brzezek@gmail.com)
 GitHub: https://github.com/IgorBrzezek/yt-audio-download
-Release Date: 21.01.2026
+Release Date: 08.02.2026
 License: MIT License
 
 --- DESCRIPTION ---
 
 A robust Python-based command-line utility for extracting high-quality audio
-(MP3) or video (MP4) from YouTube. This version introduces significant
-enhancements in audio and video format options, output modes, improved
-reliability with retries, and a more interactive experience for handling
-existing files. It features advanced signal handling, improved minimal
-UI modes, and detailed error tracking.
+(MP3) or video (MP4) from YouTube. Version 1.20 introduces yt-dlp management
+tools, improved temporary file handling, single-line progress display, and
+comprehensive bug fixes. Features enhanced reliability, cleaner progress
+output, and full English language support.
 
 --- REQUIREMENTS ---
 
 1. Python 3.x
-2. yt-dlp (Main engine - ensure it is updated: yt-dlp -U)
+2. yt-dlp (Main engine - ensure it is updated: yt-dlp -U or use --dlupg)
 3. FFmpeg & FFprobe (Required for audio conversion and merging)
 4. colorama (Optional: provides terminal colors for progress tracking)
 
---- KEY FEATURES IN v1.19 ---
+--- KEY FEATURES IN v1.20 ---
 
-* EXTENDED AUDIO FORMATS: New options for high-quality stereo MP3 (-mp3slow)
+* YT-DLP MANAGEMENT: Built-in commands to check (--dlver), compare (--dlchk),
+  and update (--dlupg) yt-dlp directly from the script.
+* SINGLE-LINE PROGRESS: Unified format showing file number, download progress,
+  conversion progress, and summary all on one clean line.
+* IMPROVED TEMP FILE HANDLING: All temporary files use 'ytextr_tmp_' prefix
+  and are automatically cleaned up at startup and during operation.
+* LANGUAGE STANDARDIZATION: Complete English language support throughout
+  code, comments, and user messages.
+* FIXED OVERWRITE BUG: Interactive overwrite prompt now properly deletes
+  existing files before re-downloading.
+* EXTENDED AUDIO FORMATS: Options for high-quality stereo MP3 (-mp3slow)
   and space-saving mono MP3 (-mono).
-* EXTENDED VIDEO FORMATS: Added specific options for 1080p (-mp41080) and
+* EXTENDED VIDEO FORMATS: Specific options for 1080p (-mp41080) and
   480p (-mp4480) video downloads.
-* ENHANCED OUTPUT MODES: Introduce --compact for a cleaner list view,
-  --summarize for detailed post-download reports, and --title to display
-  titles for each item in list mode.
-* IMPROVED CONCURRENCY & RELIABILITY: Specify FFmpeg compression threads
-  (-t/--threads) and enable automatic retries for failed downloads
-  (-ret/--retries).
-* INTERACTIVE OVERWRITE: A new prompt ([y/N/a/q]) for handling existing
-  files, offering more control (overwrite, skip, overwrite all, or quit).
-* SMART PROGRESS: Choose between full progress bars, a single-line minimal mode,
-  compact list view, or silent batch processing.
-* ANTI-BLOCKING: Built-in support for browser cookies, custom User-Agent
-  spoofing (v128 Chrome), and Android client emulation.
-* ERROR LOGGING: Failsafe mechanism that records failed URLs into
-  'ytextractor.err' for later review.
-* ABORT PROTECTION: Clean exit handling (Ctrl+C) that kills all background
-  processes and removes partial temp files instantly.
-* UTF-8 COMPATIBILITY: Native support for special characters and emojis in
-  video titles.
+* ENHANCED OUTPUT MODES: --compact for cleaner list view, --summarize for
+  detailed post-download reports, and --title to display titles.
+* IMPROVED CONCURRENCY & RELIABILITY: Specify FFmpeg threads (-t/--threads)
+  and enable automatic retries (-ret/--retries).
+* INTERACTIVE OVERWRITE: Prompt ([y/N/a/q]) for handling existing files
+  with full control (overwrite, skip, overwrite all, or quit).
+* ANTI-BLOCKING: Support for browser cookies, custom User-Agent spoofing,
+  and Android client emulation.
+* ERROR LOGGING: Records failed URLs into 'ytextractor.err' for review.
+* ABORT PROTECTION: Clean exit handling (Ctrl+C) that kills background
+  processes and removes partial files instantly.
 
 --- COMMAND LINE OPTIONS ---
 
@@ -95,6 +97,11 @@ UTILITIES
   --verbose             Verbose output.
   -t, --threads         Number of threads for compression (default: 1).
   -ret, --retries       Number of retries for a failed download (default: 1).
+
+YT-DLP MANAGEMENT
+  --dlver               Show current yt-dlp version.
+  --dlchk               Check latest yt-dlp version available online.
+  --dlupg               Update yt-dlp to latest version (OS-specific).
 
 --- USAGE EXAMPLES ---
 
