@@ -84,7 +84,10 @@ Before running the script, you **MUST** have the following tools installed and a
     *   This is the main download engine.
     *   Download from here: [https://github.com/yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp)
     *   Or:
-    *   Instal (on Windows): winget install yt-dlp
+    *   Instal (on Windows):
+    *   ```cmd
+        winget install yt-dlp
+        ```
     *   **CRITICAL:** YouTube frequently changes its site. You MUST keep `yt-dlp` up to date.
         Run this command regularly:
         ```bash
